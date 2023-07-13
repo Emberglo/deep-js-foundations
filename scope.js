@@ -132,3 +132,154 @@ anotherTeacher();
 // used so we can have a "private" scope for the execution of that function
 // wrapping the function in parenthases turns the function into an expression rather than a declaration
 
+// can be written anonymoutly as well: (DONT)
+(function(teacher) {console.log(teacher);})("Suzy");
+// if you can't come up with a name to use, just use IIFE as the name. Makes debugging and things easier.
+
+// another use for IIFEs - making statements (like try/catch) into expressions
+var teacher;
+try {
+    teacher = fetchTeacher(1)
+}
+catch (err) {
+    teacher = "Kyle"
+}
+
+// becomes:
+
+var teacher = (function getTeacher() {
+    try {
+        return fetchTeacher(1);
+    }
+    catch (err) {
+        return "Kyle";
+    }
+})();
+
+// Block Scoping
+
+// instead of an IFFE:
+var teacher = "Kyle";
+
+(function anotherTeacher() {
+    var teacher = "Suzy";
+    console.log(teacher); // "Suzy"
+})
+
+console.log(teacher); // "Kyle"
+
+// use a block
+
+var teacher = "Kyle";
+
+{
+    let teacher = "Suzy";
+    console.log(teacher); // "Suzy"
+}
+
+console.log(teacher); // "Kyle"
+
+// using var in the block would attach itself to the outer scope, so we have to use let
+// blocks aren't scopes until they have a let or const inside of them
+
+// realistic use case of block scoping:
+function diff(x, y) {
+    if (x > y) {
+        let temp = x;
+        x = y;
+        y = temp;
+    }
+
+    return y - x;
+}
+
+// by putting the temp inside the if statement, you were telling the reader that it "belongs" to the if
+// using let rather than var reinforces that it's a temp variable and only to be used in that if statement
+
+
+// var or let
+
+function repeat(fn, n) {
+    // use var when the variable will be used throughout the function
+    var result;
+
+    // use let for localized variables like in loops
+    for (let i = 0; i < n; i++) {
+        result = fn(result, i);
+    }
+
+    return result;
+}
+
+// car can be used more than once in a function and let can't be used this way
+
+function lookupRecord(searchStr) {
+    try {
+        var id = getRecord(searchStr);
+    } catch (err) {
+        var id = -1;
+    }
+
+    return id;
+}
+
+// if you want to use let at the top level of a function open and explicit let block
+
+function formatStr(str) {
+    { let prefix, rest;
+        prefix = str.slice(0, 3);
+        rest = str.slice(3);
+        str = prefix.toUpperCase() + rest;
+    }
+
+    if (/^FOO:/.test(str)) {
+        return str;
+    }
+
+    return str.slice(4);
+}
+
+
+// hoisting
+
+student;
+teacher;
+var student = "you";
+var teacher = "Kyle";
+
+// hoisting says that JS would move the var declarations ahead of the execution - this doesn't actually happen
+// hoisting is a shorthand for talking about parsing/lexical scope
+// basically hoisting pretends that the compiler/parser only makes a single pass and magically identifies declarations
+// instead of making two passes with the first identifying delcarations and scopes and the second handling the executions
+// for the same reason it doesn't move variables, it doesn't move functions
+
+// if you assign an unnamed function to a variable, you have to have that function defined before you try to execute it
+
+// var hoisting is usually bad (hard to read, etc)
+// function hoisting is usually pretty useful
+
+// "let doesn't hoist" - innacurate statement
+
+{
+    teacher = "Kyle"; // TDZ error
+    let teacher;
+}
+
+// let actually does hoist:
+
+var teacher = "Kyle";
+
+{
+    console.log(teacher); // TDZ error
+    let teacher = "Suzy";
+}
+
+// if the teacher on line 274 did not hoist, the console log on 273 should have printed "Kyle"
+// because in the scope at line 273, there is no teacher so it should have gone up a level
+
+// lets and consts still hoist but differently 
+// lets and const only hoist to a block var hoists to a function
+// during compile time when it says there will be a var variableName, it also says when the scope starts initialize the variableName to undefined
+// when let hoists in block scope if creates a location called let variableName but don't initialize it
+
+
