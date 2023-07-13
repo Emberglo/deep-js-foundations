@@ -111,3 +111,24 @@ var paidStudentsToEnroll = () => [
 
 var remindUnpaid = recordIds => 
     printRecords(recordIds.filter(studentId => !getStudentById().paid));
+
+
+
+function anotherTeacher() {
+    var teacher = "Suzy";
+    console.log(teacher);
+}
+
+// can call above function like normal
+anotherTeacher();
+
+// can put parenthases around the function name and still call it:
+(anotherTeacher)();
+
+// can put the function definition in parenthases and call it immediately
+(function anotherTeacher() {var teacher = "Susy"; console.log(teacher);})();
+
+// the above is IIFE - Immediately Invoked Function Expression
+// used so we can have a "private" scope for the execution of that function
+// wrapping the function in parenthases turns the function into an expression rather than a declaration
+
