@@ -281,5 +281,3 @@ var teacher = "Kyle";
 // lets and const only hoist to a block var hoists to a function
 // during compile time when it says there will be a var variableName, it also says when the scope starts initialize the variableName to undefined
 // when let hoists in block scope if creates a location called let variableName but don't initialize it
-
-
