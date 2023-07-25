@@ -153,3 +153,136 @@ ask("What's the non-strict-mode default?"); // Kyle What's the non-strict-mode d
 
 // in strict mode if there's no this binding, this = undefined
 askAgain("What's the strict-mode default?"); // TypeError
+
+
+// have to look at how the function is being called to determine what the this keyword refers to
+
+
+//this determination
+
+var workshop = {
+    teacher: "Kyle",
+    ask: function ask(question) {
+        console.log(this.teacher, question);
+    },
+};
+
+new (workshop.ask.bind(workshop))("What does this do?"); // undefined What does this do?
+
+// 1 - Was function created by new? - the new object will be this
+// 2 - Is the function called by call() or apply()? - the context object specified will be this
+//      bind() effectively uses apply()
+// 3 - Is function called on a context object? - this will be that context object
+// 4 - Default: global object (except in strict mode: undefined)
+
+
+// arrow functions
+
+var workshop = {
+    teacher: "Kyle",
+    ask(qustion) {
+        setTimeout(() => {
+            console.log(this.teacher, question);
+        }, 100);
+    },
+};
+
+workshop.ask("Is this lexical 'this'?"); // Kyle Is this lexical 'this'?
+
+// arrow functions don't have a this at all
+// lexical this - an arrow function does not define a this keyword, so if you put a this inside an arrow function it will lexically resolve like any other variable (look to parent scope) until it finds a scope with a defined this
+// in this example this looks from the arrow function up to the ask() scope and ask()'s this was set by the call site to point at the workshop object
+
+
+var workshop = {
+    teacher: "Kyle",
+    ask: (question) => {
+        console.log(this.teacher, question);
+    },
+};
+
+workshop.ask("What happened to 'this'?"); // undefined What happend to 'this'?
+
+workshop.ask.call(workshop, "Still no 'this'?"); // undefined Still no 'this'?
+
+// arrow function has no this, so it looks to parent scope, which in this case is global and gets undefined
+// objects are not scopes just because they have curly braces
+
+
+// the only time you should use an arrow function is when you want to benefit from lexical this 
+// Kyle wrote an eslint rule that requires arrow functions to make this references:
+// https://github.com/getify/eslint-plugin-arrow-require-this
+
+// if you're going to use an arrow function for lexical this you need to combat the downsides:
+// anonymous functions don't have a self reference - needed for recursion or binding
+// they don't have a name - use it so it gets a name inference (assign to a variable, etc)
+// need to have a way to make the purpose of the function clear - don't make readers read the function body
+
+// var self = this should really be var context = this - but its a hacky way of setting it - better to use an arrow function
+
+
+
+
+
+// es6 class keyword
+
+// syntatcic sugar layered on top of prototypes
+
+// classes don't have to be statements, they can be expressions and can be anonymous (don't do that)
+
+class Workshop {
+    constructor(teacher) {
+        this.teacher = teacher;
+    };
+
+    ask(question) {
+        console.log(this.teacher, question);
+    };
+};
+
+var deepJS = new Workshop("Kyle");
+var reactJS = new Workshop("Suzy");
+
+deepJS.ask("Is 'class' a class?"); // Kyle Is 'class' a class?
+reactJS.ask("Is this class OK?"); // Suzy Is this class OK?
+
+class AnotherWorkshop extends Workshop {
+    speakUp(msg) {
+        this.ask(msg);
+    };
+};
+
+var JSRecentParts = new AnotherWorkshop("Kyle");
+
+JSRecentParts.speakUp("Are classes getting better?"); // Kyle Are classes getting better?
+
+// super keyword allows you to do relative polymorphism
+
+class Workshop {
+    constructor(teacher) {
+        this.teacher = teacher;
+    };
+
+    ask(question) {
+        console.log(this.teacher, question);
+    };
+};
+
+class AnotherWorkshop extends Workshop {
+    ask(msg) {
+        super.ask(msg.toUpperCase());
+    };
+};
+
+var JSRecentParts = new AnotherWorkshop("Kyle");
+
+JSRecentParts.ask("Are classes super?"); // Kyle ARE CLASSES SUPER?
+
+// if you have a child class that defines a method with the same name as the parent class (shadowing) you can refer to the parent from the child super.methodName
+
+// there was no way to do relative polymorphism until es6 classes
+
+// didn't change anything fundamentally on function calls and this binding
+
+// if you define a parent class wtih no constructor that has a child class with a constructor:
+// you have to call super() first thing in the child constructor
