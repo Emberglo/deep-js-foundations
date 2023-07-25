@@ -45,7 +45,7 @@ workshop.ask("It's a module, right?");  // Kyle It's a module, right?
 // closure protects state of teacher from public access but still allows us access to it through the ask function
 
 
-// module factory
+// module factory - creates a new instance of our module every time it's called
 
 function WorkshopModule(teacher) {
     var publicAPI = {ask, };
@@ -59,4 +59,33 @@ function WorkshopModule(teacher) {
 var workshop = WorkshopModule("Kyle");
 
 workshop.ask("It's a module, right?"); // Kyle It's a module, right?
+
+
+// es6 module pattern
+// to use modules in node, you have to use a different file extension .mjs (first part of solution was expected in 2020 - don't know status now)
+// workshop.mjs:
+var teacher = "Kyle";
+
+export default function ask(question) {
+    console.log(teacher, question);
+};
+
+// file assumes everything is private
+// anything exported is public
+
+// impossible to have more than one module in the same file
+// file is a singleton
+// have to expose a factory function if you want that pattern
+
+// type main types of import in regular code:
+
+// named import:
+import ask from "workshop.mjs";
+
+ask("It's a default import, right?"); // Kyle It's a default import, right?
+
+// namespace import:
+import * as workshop from "workshop.mjs";
+
+workshop.ask("It's a namespace import, right?"); // Kyle It's a namespace import, right?
 
